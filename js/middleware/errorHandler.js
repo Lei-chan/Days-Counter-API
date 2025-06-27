@@ -15,12 +15,13 @@ const errorHandler = function (err, req, res, next) {
   //MongoDB validation error
   if (err.name === "ValidationError") {
     const message = Object.values(err.errors);
-    error = { message, statusCode: 400 };
+    error = { name: err.name, message, statusCode: 400 };
   }
 
   if (err.name === "ExpressValidatorError") {
     const message = err.validationErrors.map((err) => err.msg).join(", ");
     error = {
+      name: err.name,
       message,
       statusCode: 400,
       errors: err.validationErrors,
@@ -29,6 +30,7 @@ const errorHandler = function (err, req, res, next) {
 
   res.status(error.statusCode || 500).json({
     success: false,
+    name: err.name || "",
     message: error.message || "Server error",
     ...(error.errors && { errors: error.errors }),
   });

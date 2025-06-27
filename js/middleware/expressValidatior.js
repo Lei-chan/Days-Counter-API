@@ -23,7 +23,7 @@ export const validateNewUser = [
     .withMessage("Password must be at least 8 characters long")
     .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s])/)
     .withMessage(
-      "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special chatacter"
+      "Please include at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character"
     ),
   body("email")
     .optional({ checkFalsy: true })

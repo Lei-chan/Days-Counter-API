@@ -20,6 +20,17 @@ const setRefreshTokenCookie = (res, refreshToken) =>
     maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   });
 
+const deleteOldRefreshToken = async (req, res) => {
+  try {
+    const refreshTokenCookie = req.cookies.refreshToken;
+    await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
+    res.clearCookie("refreshToken");
+  } catch (err) {
+    err.message = `Error while deleting old refresh token, ${err}`;
+    throw err;
+  }
+};
+
 //For dev
 export const deleteUsers = async function (req, res, next) {
   try {
@@ -39,6 +50,8 @@ export const deleteTokens = async function (req, res, next) {
   try {
     const deleted = await RefreshToken.deleteMany();
 
+    res.clearCookie(req.cookies.refreshToken);
+
     res.json({
       success: true,
       message: "tokens deleted successfully",
@@ -55,7 +68,7 @@ export const login = async function (req, res, next) {
 
     const user = await User.findOne({ username }).select("+password");
 
-    const isValidPassword = await user.comparePassword(password);
+    const isValidPassword = await user?.comparePassword(password);
 
     if (!user || !isValidPassword) {
       const err = new Error("User not found");
@@ -71,6 +84,13 @@ export const login = async function (req, res, next) {
     await storeRefreshToken(user._id, refreshToken);
 
     setRefreshTokenCookie(res, refreshToken);
+
+    await deleteOldRefreshToken(req, res);
+
+    console.log(
+      "This should be always null",
+      await RefreshToken.findOne({ refreshToken: req.cookies.refreshToken })
+    );
 
     res.json({
       accessToken,
@@ -105,8 +125,7 @@ export const refreshToken = async function (req, res, next) {
   const decoded = verifyRefreshToken(refreshTokenCookie);
   if (!decoded) {
     //Remove invalid token
-    await RefreshToken.deleteOne({ refreshTokenCookie });
-    res.clearCookie("refreshToken");
+    await deleteOldRefreshToken(req, res);
 
     const err = new Error("Invalid refresh token");
     err.statusCode = 403;
@@ -118,9 +137,15 @@ export const refreshToken = async function (req, res, next) {
   const newAccessToken = generateAccessToken(userId);
   const newRefreshToken = generateRefreshToken(userId);
 
+  setRefreshTokenCookie(res, newRefreshToken);
   await storeRefreshToken(userId, newRefreshToken);
 
-  setRefreshTokenCookie(res, newRefreshToken);
+  await deleteOldRefreshToken(req, res);
+
+  console.log(
+    "This should be always null",
+    await RefreshToken.findOne({ userId, refreshToken: refreshTokenCookie })
+  );
 
   res.json({
     accessToken: newAccessToken,
@@ -162,6 +187,7 @@ export const createUser = async (req, res, next) => {
     if (existingUser) {
       const err = new Error("The username and the email already exist");
       err.statusCode = 400;
+      err.name = "DuplicateUserInfo";
       return next(err);
     }
 
@@ -184,11 +210,10 @@ export const createUser = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    console.error(err, "😭😭😭");
+    console.error(err.name, "😭😭😭");
     if (err.name !== "ValidationError" || err.name !== "ExpressValidatorError")
       err.message = "Server error while creating user";
 
-    console.error("Error while creating user", err);
     next(err);
   }
 };
@@ -202,18 +227,6 @@ export const updateUser = async (req, res, next) => {
       err.statusCode = 404;
       return next(err);
     }
-
-    // const updatedFields = {};
-    // Object.keys(req.body).forEach((key) => {
-    //   if (generalUpdateFields.includes(key)) updatedFields[key] = req.body[key];
-    // });
-
-    // if (!Object.keys(updatedFields).length) {
-    //   const err = new Error("At least one field is required");
-    //   err.statusCode = 400;
-    //   err.requiredFields = generalUpdateFields;
-    //   return next(err);
-    // }
 
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
@@ -240,7 +253,6 @@ export const deleteUser = async (req, res, next) => {
   try {
     const user = req.user;
     const { password } = req.body;
-    const refreshToken = req.cookies.refreshToken;
 
     const userWithPassword = await User.findById(user._id).select("+password");
 
@@ -256,8 +268,11 @@ export const deleteUser = async (req, res, next) => {
       "-password"
     );
 
-    await RefreshToken.deleteOne({ refreshToken });
-    res.clearCookie("refreshToken");
+    await deleteOldRefreshToken(req, res);
+    console.log(
+      "This should be always null",
+      RefreshToken.findOne({ refreshToken: req.cookies.refreshToken })
+    );
 
     res.json({
       success: true,

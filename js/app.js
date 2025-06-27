@@ -32,11 +32,11 @@ app.use(
 );
 
 const limiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
+  windowMs: 30 * 60 * 1000,
   max: 100,
   message: {
     success: false,
-    message: "Too many requiests from this IP, please try again later",
+    message: "Too many requiests from this IP, Try again later",
   },
 });
 
