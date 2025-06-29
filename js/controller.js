@@ -286,3 +286,51 @@ export const deleteUser = async (req, res, next) => {
     next(err);
   }
 };
+
+export const createRoom = async function (req, res, next) {
+  try {
+    const { roomId, ...others } = req.body;
+
+    if (!roomId) {
+      const err = new Error("Please provide room id");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const newRoom = await Room.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      room: newRoom,
+      message: "Room created successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const findUserRoom = async function (req, res, next) {
+  try {
+    const { roomId, ...others } = req.body;
+
+    if (!roomId) {
+      const err = new Error("Invalid room. Room id is required.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
+
+    const sharingUserNames = sharingUsers.map((user) => user.username);
+
+    res.json({
+      success: true,
+      message: sharingUsers
+        ? "Find users for room successfully"
+        : "No other users",
+      usernames: sharingUserNames || [],
+    });
+  } catch (err) {
+    next(err);
+  }
+};

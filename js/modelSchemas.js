@@ -18,16 +18,40 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
-    goals: Array,
+    goals: [{ title: String, date: String, comments: Array, toDoLists: Array }],
     remainingDaysPrev: Array,
     remainingDaysNow: Array,
     howManyTimesClick: Array,
-    roomIds: Array,
+    rooms: [
+      {
+        roomId: String,
+        users: Array,
+        title: String,
+        date: String,
+        comments: Array,
+        toDoLists: Array,
+      },
+    ],
+    remainingDaysPrevRooms: Array,
+    remainingDaysNowRooms: Array,
+    howManyTimesClickRooms: Array,
   },
   {
     timestamps: true,
   }
 );
+
+const roomSchema = new mongoose.Schema({
+  roomId: {
+    type: String,
+    required: true,
+  },
+  usernames: Array,
+  title: String,
+  date: String,
+  comments: Array,
+  toDoLists: Array,
+});
 
 const refreshTokenSchema = new mongoose.Schema(
   {
@@ -46,10 +70,6 @@ const refreshTokenSchema = new mongoose.Schema(
   }
 );
 
-const roomSchema = new mongoose.Schema({
-  rooms: Array,
-});
-
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) next();
   try {
@@ -67,7 +87,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 // export const fields = Object.keys(userSchema.obj);
-export const generalUpdateFields = ["username", "email", "goals", "roomIds"];
+export const generalUpdateFields = ["username", "email", "goals", "rooms"];
 export const User = mongoose.model("User", userSchema);
-export const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema);
 export const Room = mongoose.model("Room", roomSchema);
+export const RefreshToken = mongoose.model("RefreshToken", refreshTokenSchema);

@@ -31,7 +31,7 @@ export const verifyRefreshToken = function (token) {
 };
 
 //Authentication middleware
-export const autheticateToken = async function (req, res, next) {
+export const authenticateToken = async function (req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
 

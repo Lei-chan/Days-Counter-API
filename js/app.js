@@ -32,7 +32,7 @@ app.use(
 );
 
 const limiter = rateLimit({
-  windowMs: 30 * 60 * 1000,
+  windowMs: 10 * 60 * 1000,
   max: 100,
   message: {
     success: false,
@@ -42,7 +42,7 @@ const limiter = rateLimit({
 
 app.use(cookieParser());
 
-app.use("/api/user", limiter, routes);
+app.use("/api/", limiter, routes);
 
 app.use(errorHandler);
 

@@ -8,8 +8,10 @@ import {
   deleteUser,
   deleteUsers,
   deleteTokens,
+  createRoom,
+  findUserRoom,
 } from "./controller.js";
-import { autheticateToken } from "./middleware/auth.js";
+import { authenticateToken } from "./middleware/auth.js";
 import {
   validateNewUser,
   validateUserGeneral,
@@ -19,7 +21,7 @@ import {
 
 const router = express.Router();
 
-router.get("/health", (req, res) => {
+router.get("user/health", (req, res) => {
   res.json({
     success: true,
     message: "Server is running",
@@ -29,20 +31,20 @@ router.get("/health", (req, res) => {
 });
 
 //For dev
-router.delete("/deleteAll", deleteUsers);
-router.delete("/deleteTokens", deleteTokens);
+router.delete("user/deleteAll", deleteUsers);
+router.delete("user/deleteTokens", deleteTokens);
 
-router.post("/login", login);
+router.post("user/login", login);
 
-router.post("/refresh", refreshToken);
+router.post("user/refresh", refreshToken);
 
-router.get("/get", autheticateToken, getCurrentUser);
+router.get("user/get", authenticateToken, getCurrentUser);
 
-router.post("/create", validateNewUser, handleValidatorErrors, createUser);
+router.post("user/create", validateNewUser, handleValidatorErrors, createUser);
 
 router.patch(
-  "/update/general",
-  autheticateToken,
+  "user/update/general",
+  authenticateToken,
   validateUserGeneral,
   handleValidatorErrors,
   updateUser
@@ -50,12 +52,15 @@ router.patch(
 
 //Later
 router.patch(
-  "/update/password",
-  autheticateToken,
+  "user/update/password",
+  authenticateToken,
   validateUserPasswordUpdate,
   handleValidatorErrors
 );
 
-router.delete("/delete", autheticateToken, deleteUser);
+router.delete("user/delete", authenticateToken, deleteUser);
+
+router.post("room/create", createRoom);
+router.get("room/findUsers", findUserRoom);
 
 export default router;
