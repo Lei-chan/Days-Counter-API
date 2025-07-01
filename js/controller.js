@@ -269,15 +269,59 @@ export const createRoom = async function (req, res, next) {
   }
 };
 
-export const findUserRoom = async function (req, res, next) {
+export const getRoom = async function (req, res, next) {
   try {
-    const roomId = req.params.roomId;
+    const { roomId } = req.params;
 
-    if (!roomId) {
-      const err = new Error("Invalid room. Room id is required.");
-      err.statusCode = 400;
+    const room = await Room.findOne({ roomId });
+
+    console.log(room);
+    if (!room) {
+      const err = new Error("Room not found");
+      err.statusCode = 404;
+      return next(room);
+    }
+
+    res.json({
+      success: true,
+      message: "Got room successfully",
+      room,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateRoom = async function (req, res, next) {
+  try {
+    const { roomId } = req.params;
+
+    const updated = await Room.findOneAndUpdate({ roomId }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    console.log(updated);
+
+    if (!updated) {
+      const err = new Error("Room not found");
+      err.statusCode = 404;
       return next(err);
     }
+
+    res.json({
+      success: true,
+      message: "Updated room successfully",
+      room: updated,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const findUserRoom = async function (req, res, next) {
+  try {
+    const { roomId } = req.params;
 
     const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
 
