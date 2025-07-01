@@ -1,4 +1,9 @@
-import { User, RefreshToken, generalUpdateFields } from "./modelSchemas.js";
+import {
+  User,
+  Room,
+  RefreshToken,
+  generalUpdateFields,
+} from "./modelSchemas.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -31,37 +36,6 @@ const deleteOldRefreshToken = async (req, res) => {
   }
 };
 
-//For dev
-export const deleteUsers = async function (req, res, next) {
-  try {
-    const deleted = await User.deleteMany();
-
-    res.json({
-      success: true,
-      message: "Users deleted successfully",
-      data: deleted,
-    });
-  } catch (err) {
-    console.error("Error while deleting users", err);
-  }
-};
-
-export const deleteTokens = async function (req, res, next) {
-  try {
-    const deleted = await RefreshToken.deleteMany();
-
-    res.clearCookie(req.cookies.refreshToken);
-
-    res.json({
-      success: true,
-      message: "tokens deleted successfully",
-      data: deleted,
-    });
-  } catch (err) {
-    console.error("Error while deleting tokens", err);
-  }
-};
-
 export const login = async function (req, res, next) {
   try {
     const { username, password } = req.body;
@@ -87,19 +61,14 @@ export const login = async function (req, res, next) {
 
     await deleteOldRefreshToken(req, res);
 
-    console.log(
-      "This should be always null",
-      await RefreshToken.findOne({ refreshToken: req.cookies.refreshToken })
-    );
-
     res.json({
       accessToken,
       user: { id: user._id, username },
     });
   } catch (err) {
     if (err.name !== "ValidationError")
-      // err.message = "Server error during login";
-      next(err);
+      err.message = "Server error during login";
+    next(err);
   }
 };
 
@@ -141,11 +110,6 @@ export const refreshToken = async function (req, res, next) {
   await storeRefreshToken(userId, newRefreshToken);
 
   await deleteOldRefreshToken(req, res);
-
-  console.log(
-    "This should be always null",
-    await RefreshToken.findOne({ userId, refreshToken: refreshTokenCookie })
-  );
 
   res.json({
     accessToken: newAccessToken,
@@ -269,10 +233,6 @@ export const deleteUser = async (req, res, next) => {
     );
 
     await deleteOldRefreshToken(req, res);
-    console.log(
-      "This should be always null",
-      RefreshToken.findOne({ refreshToken: req.cookies.refreshToken })
-    );
 
     res.json({
       success: true,
@@ -311,7 +271,7 @@ export const createRoom = async function (req, res, next) {
 
 export const findUserRoom = async function (req, res, next) {
   try {
-    const { roomId, ...others } = req.body;
+    const roomId = req.params.roomId;
 
     if (!roomId) {
       const err = new Error("Invalid room. Room id is required.");
@@ -321,7 +281,7 @@ export const findUserRoom = async function (req, res, next) {
 
     const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
 
-    const sharingUserNames = sharingUsers.map((user) => user.username);
+    const sharingUserNames = sharingUsers?.map((user) => user.username);
 
     res.json({
       success: true,
@@ -329,6 +289,51 @@ export const findUserRoom = async function (req, res, next) {
         ? "Find users for room successfully"
         : "No other users",
       usernames: sharingUserNames || [],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//For dev
+export const deleteUsers = async function (req, res, next) {
+  try {
+    const deleted = await User.deleteMany();
+
+    res.json({
+      success: true,
+      message: "Users deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    console.error("Error while deleting users", err);
+  }
+};
+
+export const deleteTokens = async function (req, res, next) {
+  try {
+    const deleted = await RefreshToken.deleteMany();
+
+    res.clearCookie(req.cookies.refreshToken);
+
+    res.json({
+      success: true,
+      message: "tokens deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    console.error("Error while deleting tokens", err);
+  }
+};
+
+export const deleteRooms = async function (req, res, next) {
+  try {
+    const deleted = await Room.deleteMany();
+
+    res.json({
+      success: true,
+      message: "Rooms deleted successfully",
+      data: deleted,
     });
   } catch (err) {
     next(err);

@@ -31,18 +31,18 @@ app.use(
   })
 );
 
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 100,
-  message: {
-    success: false,
-    message: "Too many requiests from this IP, Try again later",
-  },
-});
+// const limiter = rateLimit({
+//   windowMs: 10 * 60 * 1000,
+//   max: 100,
+//   message: {
+//     success: false,
+//     message: "Too many requiests from this IP, Try again later",
+//   },
+// });
 
 app.use(cookieParser());
 
-app.use("/api/", limiter, routes);
+app.use("/api", routes);
 
 app.use(errorHandler);
 

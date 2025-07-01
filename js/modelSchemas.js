@@ -18,7 +18,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
-    goals: [{ title: String, date: String, comments: Array, toDoLists: Array }],
+    goals: [
+      {
+        title: String,
+        date: String,
+        comments: Array,
+        toDoLists: Array,
+        selected: Boolean,
+      },
+    ],
     remainingDaysPrev: Array,
     remainingDaysNow: Array,
     howManyTimesClick: Array,
