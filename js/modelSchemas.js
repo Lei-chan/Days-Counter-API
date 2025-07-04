@@ -6,17 +6,20 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
+      trim: true,
     },
     email: {
       type: String,
       unique: true,
       lowercase: true,
+      trim: true,
       sparse: true,
     },
     password: {
       type: String,
       required: true,
       select: false,
+      trim: true,
     },
     goals: [
       {
@@ -33,7 +36,7 @@ const userSchema = new mongoose.Schema(
     rooms: [
       {
         roomId: String,
-        users: Array,
+        usernames: Array,
         title: String,
         date: String,
         comments: Array,
