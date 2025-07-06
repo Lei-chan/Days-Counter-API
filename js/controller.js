@@ -199,6 +199,8 @@ export const updateUser = async (req, res, next) => {
       .select("-password")
       .select("-__v");
 
+    console.log(updatedUser);
+
     res.json({
       message: "User updated successfully",
       user: updatedUser,

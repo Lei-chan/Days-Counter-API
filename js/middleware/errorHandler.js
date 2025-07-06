@@ -9,8 +9,10 @@ const errorHandler = function (err, req, res, next) {
     error = { message: "Resource not found", statusCode: 404 };
 
   //MongoDB duplicate key error
-  if (err.code === 11000)
+  if (err.code === 11000) {
+    console.log(err);
     error = { message: "Duplicate field value", statusCode: 400 };
+  }
 
   //MongoDB validation error
   if (err.name === "ValidationError") {

@@ -66,7 +66,7 @@ router.delete("/user/delete", authenticateToken, deleteUser);
 router.post("/room/create", createRoom);
 router.get("/room/findUsers/:roomId", findUserRoom);
 router.get("/room/:roomId", authenticateToken, getRoom);
-router.patch("room/update/:roomId", authenticateToken, updateRoom);
+router.patch("/room/update/:roomId", authenticateToken, updateRoom);
 
 router.delete("/room/deleteAll", deleteRooms);
 
