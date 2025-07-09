@@ -12,6 +12,7 @@ import {
   findUserRoom,
   getRoom,
   updateRoom,
+  deleteRoom,
   deleteRooms,
 } from "./controller.js";
 import { authenticateToken } from "./middleware/auth.js";
@@ -67,6 +68,7 @@ router.post("/room/create", createRoom);
 router.get("/room/findUsers/:roomId", findUserRoom);
 router.get("/room/:roomId", authenticateToken, getRoom);
 router.patch("/room/update/:roomId", authenticateToken, updateRoom);
+router.delete("/room/delete/:roomId", authenticateToken, deleteRoom);
 
 router.delete("/room/deleteAll", deleteRooms);
 

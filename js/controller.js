@@ -192,6 +192,7 @@ export const updateUser = async (req, res, next) => {
       return next(err);
     }
 
+    console.log(req.body, "🌟🌟");
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
       runValidators: true,
@@ -335,6 +336,22 @@ export const findUserRoom = async function (req, res, next) {
         ? "Find users for room successfully"
         : "No other users",
       usernames: sharingUserNames || [],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteRoom = async function (req, res, next) {
+  try {
+    const { roomId } = req.params;
+
+    const deletedRoom = await Room.findOneAndDelete({ roomId });
+
+    res.json({
+      success: true,
+      message: "Room deleted successfully",
+      data: deletedRoom,
     });
   } catch (err) {
     next(err);
