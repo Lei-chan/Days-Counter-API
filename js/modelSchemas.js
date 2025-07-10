@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
         date: String,
         comments: String,
         toDoLists: String,
+        toDoListsCheckbox: Array,
         selected: Boolean,
       },
     ],
@@ -41,6 +42,7 @@ const userSchema = new mongoose.Schema(
         date: String,
         comments: String,
         toDoLists: String,
+        toDoListsCheckbox: Array,
       },
     ],
     remainingDaysPrevRooms: Array,
@@ -62,6 +64,7 @@ const roomSchema = new mongoose.Schema({
   date: String,
   comments: String,
   toDoLists: String,
+  toDoListsCheckbox: Array,
 });
 
 const refreshTokenSchema = new mongoose.Schema(
