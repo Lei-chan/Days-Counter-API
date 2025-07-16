@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import "dotenv/config";
 import { User } from "../modelSchemas.js";
 
@@ -58,4 +59,14 @@ export const authenticateToken = async function (req, res, next) {
   }
 
   next();
+};
+
+export const hashNewPassword = async function (req, res, next) {
+  try {
+    const salt = await bcrypt.genSalt();
+    req.body.newPassword = await bcrypt.hash(req.body.newPassword, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
 };

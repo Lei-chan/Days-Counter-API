@@ -14,8 +14,9 @@ import {
   updateRoom,
   deleteRoom,
   deleteRooms,
+  updatePassword,
 } from "./controller.js";
-import { authenticateToken } from "./middleware/auth.js";
+import { authenticateToken, hashNewPassword } from "./middleware/auth.js";
 import {
   validateNewUser,
   validateUserGeneral,
@@ -54,12 +55,14 @@ router.patch(
   updateUser
 );
 
-//Later
+//Now
 router.patch(
   "/user/update/password",
   authenticateToken,
   validateUserPasswordUpdate,
-  handleValidatorErrors
+  handleValidatorErrors,
+  hashNewPassword,
+  updatePassword
 );
 
 router.delete("/user/delete", authenticateToken, deleteUser);

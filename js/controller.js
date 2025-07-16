@@ -36,6 +36,58 @@ const deleteOldRefreshToken = async (req, res) => {
   }
 };
 
+export const updatePassword = async function (req, res, next) {
+  try {
+    const { curPassword, newPassword } = req.body;
+
+    if (!curPassword || !newPassword) {
+      const err = new Error("Current password and new password are required");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).select("password");
+
+    if (!user) {
+      const err = new Error("User not found");
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    // console.log("user", user);
+
+    const isValidPassword = await user.comparePassword(curPassword);
+
+    if (!isValidPassword) {
+      const err = new Error("This password is incorrect. Please try again.");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { password: newPassword },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .select("-password")
+      .select("-__v");
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+      updatedField: "password",
+      user: updatedUser,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const login = async function (req, res, next) {
   try {
     const { username, password } = req.body;
@@ -192,7 +244,22 @@ export const updateUser = async (req, res, next) => {
       return next(err);
     }
 
-    console.log(req.body, "🌟🌟");
+    const updatedFields = Object.keys(req.body);
+
+    if (updatedFields.includes("username")) {
+      const alreadyExists = await User.findOne({
+        ...req.body,
+        email: user.email,
+      });
+      console.log("alreadyExists", alreadyExists);
+
+      if (alreadyExists) {
+        const err = new Error("The username and the email already exist");
+        err.statusCode = 400;
+        return next(err);
+      }
+    }
+
     const updatedUser = await User.findByIdAndUpdate(user._id, req.body, {
       new: true,
       runValidators: true,
@@ -200,12 +267,10 @@ export const updateUser = async (req, res, next) => {
       .select("-password")
       .select("-__v");
 
-    console.log(updatedUser);
-
     res.json({
       message: "User updated successfully",
       user: updatedUser,
-      // updatedFields,
+      updatedFields,
     });
   } catch (err) {
     if (err.name !== "ValidationError" || err.name !== "ExpressValidatorError")
@@ -325,17 +390,28 @@ export const updateRoom = async function (req, res, next) {
 export const findUserRoom = async function (req, res, next) {
   try {
     const { roomId } = req.params;
+    console.log(roomId);
 
-    const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
+    // const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
 
-    const sharingUserNames = sharingUsers?.map((user) => user.username);
+    const sharingRoom = await Room.findOne({ roomId });
+
+    console.log(sharingRoom);
+
+    // if (!sharingRoom) {
+    //   const err = new Error("No room found");
+    //   err.statusCode = 404;
+    //   return next(err);
+    // }
+
+    const sharingUsernames = sharingRoom?.usernames;
 
     res.json({
       success: true,
-      message: sharingUsers
+      message: sharingUsernames?.length
         ? "Find users for room successfully"
         : "No other users",
-      usernames: sharingUserNames || [],
+      usernames: sharingUsernames || [],
     });
   } catch (err) {
     next(err);

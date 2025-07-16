@@ -6,10 +6,33 @@ import { User } from "../modelSchemas.js";
 
 //Custom express validator
 const emailExists = async (email, { req }) => {
+  // if (req.params?.id) {
   const existingUser = await User.findOne({ email: email.toLowerCase() });
 
   if (existingUser && existingUser._id.toString() !== req.params?.id)
     throw new Error("Email already exists");
+  // }
+
+  // if (!req.body?.email && !req.body?.username) return;
+
+  // console.log("req.body:", req.body, "req.user:", req.user);
+
+  // let existingUser;
+  // if (req.body.username)
+  //   existingUser = await User.findOne({
+  //     ...req.body,
+  //     email: req.user.email,
+  //   });
+
+  // if (req.body.email)
+  //   existingUser = await User.findOne({
+  //     ...req.body,
+  //     username: req.user.username,
+  //   });
+
+  // if (!existingUser) return;
+
+  // throw new Error("Username and email already exist");
 };
 
 export const validateNewUser = [
@@ -50,7 +73,7 @@ export const validateUserGeneral = [
 ];
 
 export const validateUserPasswordUpdate = [
-  body("password")
+  body("newPassword")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters long")
     .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s])/)
@@ -81,6 +104,7 @@ export const handleValidatorErrors = (req, res, next) => {
     err.name = "ExpressValidatorError";
     err.statusCode = 400;
     err.validationErrors = errors.array();
+    console.log(err);
     return next(err);
   }
 

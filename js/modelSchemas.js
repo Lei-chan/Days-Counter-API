@@ -85,10 +85,11 @@ const refreshTokenSchema = new mongoose.Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) next();
+  if (!this.isModified("password")) return next();
   try {
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, salt);
+    // console.log(salt, this.password);
     next();
   } catch (err) {
     next(err);
