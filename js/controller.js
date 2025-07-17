@@ -202,8 +202,8 @@ export const createUser = async (req, res, next) => {
 
     if (existingUser) {
       const err = new Error("The username and the email already exist");
-      err.statusCode = 400;
       err.name = "DuplicateUserInfo";
+      err.statusCode = 400;
       return next(err);
     }
 
@@ -255,6 +255,7 @@ export const updateUser = async (req, res, next) => {
 
       if (alreadyExists) {
         const err = new Error("The username and the email already exist");
+        err.name = "DuplicateUserInfo";
         err.statusCode = 400;
         return next(err);
       }
