@@ -5,6 +5,7 @@ import {
   login,
   refreshToken,
   updateUser,
+  logout,
   deleteUser,
   deleteUsers,
   deleteTokens,
@@ -55,7 +56,6 @@ router.patch(
   updateUser
 );
 
-//Now
 router.patch(
   "/user/update/password",
   authenticateToken,
@@ -64,6 +64,8 @@ router.patch(
   hashNewPassword,
   updatePassword
 );
+
+router.post("/user/logout", authenticateToken, logout);
 
 router.delete("/user/delete", authenticateToken, deleteUser);
 

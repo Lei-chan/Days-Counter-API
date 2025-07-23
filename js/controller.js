@@ -29,7 +29,15 @@ const deleteOldRefreshToken = async (req, res) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken;
     await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
+
+    ///this might be unecessary when updating cookie refreshToken! Check later
     res.clearCookie("refreshToken");
+
+    // console.log("It should be null!");
+    // console.log(res.cookies);
+    // console.log(
+    //   await RefreshToken.findOne({ refreshToken: refreshTokenCookie })
+    // );
   } catch (err) {
     err.message = `Error while deleting old refresh token, ${err}`;
     throw err;
@@ -111,7 +119,7 @@ export const login = async function (req, res, next) {
 
     setRefreshTokenCookie(res, refreshToken);
 
-    await deleteOldRefreshToken(req, res);
+    // await deleteOldRefreshToken(req, res);
 
     res.json({
       accessToken,
@@ -278,6 +286,20 @@ export const updateUser = async (req, res, next) => {
       err.message = "Server error while updating user";
 
     console.error("Error while updating user", err);
+    next(err);
+  }
+};
+
+export const logout = async function (req, res, next) {
+  try {
+    await deleteOldRefreshToken(req, res);
+
+    res.json({
+      success: true,
+      message: "User logged out successfully",
+      user: req.user,
+    });
+  } catch (err) {
     next(err);
   }
 };
