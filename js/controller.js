@@ -32,12 +32,6 @@ const deleteOldRefreshToken = async (req, res) => {
 
     ///this might be unecessary when updating cookie refreshToken! Check later
     res.clearCookie("refreshToken");
-
-    // console.log("It should be null!");
-    // console.log(res.cookies);
-    // console.log(
-    //   await RefreshToken.findOne({ refreshToken: refreshTokenCookie })
-    // );
   } catch (err) {
     err.message = `Error while deleting old refresh token, ${err}`;
     throw err;
@@ -63,8 +57,6 @@ export const updatePassword = async function (req, res, next) {
       err.statusCode = 404;
       return next(err);
     }
-
-    // console.log("user", user);
 
     const isValidPassword = await user.comparePassword(curPassword);
 
@@ -259,7 +251,6 @@ export const updateUser = async (req, res, next) => {
         ...req.body,
         email: user.email,
       });
-      console.log("alreadyExists", alreadyExists);
 
       if (alreadyExists) {
         const err = new Error("The username and the email already exist");
@@ -366,7 +357,6 @@ export const getRoom = async function (req, res, next) {
 
     const room = await Room.findOne({ roomId });
 
-    console.log(room);
     if (!room) {
       const err = new Error("Room not found");
       err.statusCode = 404;
@@ -392,8 +382,6 @@ export const updateRoom = async function (req, res, next) {
       runValidators: true,
     });
 
-    console.log(updated);
-
     if (!updated) {
       const err = new Error("Room not found");
       err.statusCode = 404;
@@ -413,19 +401,8 @@ export const updateRoom = async function (req, res, next) {
 export const findUserRoom = async function (req, res, next) {
   try {
     const { roomId } = req.params;
-    console.log(roomId);
-
-    // const sharingUsers = await User.find({ rooms: [{ roomId }] }).exec();
 
     const sharingRoom = await Room.findOne({ roomId });
-
-    console.log(sharingRoom);
-
-    // if (!sharingRoom) {
-    //   const err = new Error("No room found");
-    //   err.statusCode = 404;
-    //   return next(err);
-    // }
 
     const sharingUsernames = sharingRoom?.usernames;
 
