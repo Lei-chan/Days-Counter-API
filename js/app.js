@@ -6,11 +6,12 @@ import cookieParser from "cookie-parser";
 import routes from "./routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
+//I got rid off process.env for production
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:1234",
+    origin: CLIENT_URL,
     origin: true,
     credentials: true,
     // allowedHeaders: ["Content-Type", ""],
