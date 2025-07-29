@@ -9,6 +9,8 @@ import errorHandler from "./middleware/errorHandler.js";
 //I got rid off process.env for production
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
