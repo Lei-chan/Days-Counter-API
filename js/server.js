@@ -2,7 +2,7 @@ import "dotenv/config";
 import connectDB from "./database.js";
 import app from "./app.js";
 
-const PORT = PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 let server;
 

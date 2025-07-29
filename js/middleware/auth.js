@@ -4,20 +4,20 @@ import "dotenv/config";
 import { User } from "../modelSchemas.js";
 
 export const generateAccessToken = function (userId) {
-  return jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {
-    expiresIn: ACCESS_TOKEN_EXPIRY,
+  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
   });
 };
 
 export const generateRefreshToken = function (userId) {
-  return jwt.sign({ userId }, REFRESH_TOKEN_SECRET, {
-    expiresIn: REFRESH_TOKEN_EXPIRY,
+  return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
 };
 
 export const verifyAccessToken = function (token) {
   try {
-    return jwt.verify(token, ACCESS_TOKEN_SECRET);
+    return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   } catch (err) {
     return null;
   }
@@ -25,7 +25,7 @@ export const verifyAccessToken = function (token) {
 
 export const verifyRefreshToken = function (token) {
   try {
-    return jwt.verify(token, REFRESH_TOKEN_SECRET);
+    return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   } catch (err) {
     return null;
   }
