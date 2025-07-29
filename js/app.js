@@ -6,12 +6,11 @@ import cookieParser from "cookie-parser";
 import routes from "./routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
-// Create an Express application (your web server)
 const app = express();
 
 app.use(
   cors({
-    // origin: process.env.CLIENT_URL || "http://localhost:1234",
+    origin: process.env.CLIENT_URL || "http://localhost:1234",
     origin: true,
     credentials: true,
     // allowedHeaders: ["Content-Type", ""],
@@ -27,7 +26,7 @@ app.use(
 
 app.use(
   helmet({
-    contentSecurityPolicy: false, //For development
+    contentSecurityPolicy: true,
   })
 );
 

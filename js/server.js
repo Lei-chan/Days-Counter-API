@@ -2,7 +2,6 @@ import "dotenv/config";
 import connectDB from "./database.js";
 import app from "./app.js";
 
-// Choose a port (like a door number for your server)
 const PORT = process.env.PORT || 3000;
 
 let server;
