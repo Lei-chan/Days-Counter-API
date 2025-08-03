@@ -6,7 +6,6 @@ import cookieParser from "cookie-parser";
 import routes from "./routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
-//I got rid off process.env for production
 const app = express();
 
 app.set("trust proxy", 1);
@@ -16,7 +15,8 @@ app.use(
     origin: process.env.CLIENT_URL,
     origin: true,
     credentials: true,
-    // allowedHeaders: ["Content-Type", ""],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 

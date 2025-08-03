@@ -10,7 +10,9 @@ const startServer = async function () {
   await connectDB();
   server = app.listen(PORT, () => {
     console.log(`🚀 Server is running on ${process.env.SERVER_URL}`);
-    console.log(`📡 API endpoint: ${process.env.SERVER_URL}`);
+
+    ////For dev
+    // console.log(`Server is running on http://localhost:${PORT}`);
   });
 };
 startServer();

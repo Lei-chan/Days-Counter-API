@@ -10,7 +10,7 @@ import {
   verifyRefreshToken,
 } from "./middleware/auth.js";
 
-const storeRefreshToken = async (userId, refreshToken) =>
+const storeRefreshTokenDatabase = async (userId, refreshToken) =>
   await RefreshToken.create({
     userId,
     refreshToken,
@@ -27,11 +27,22 @@ const setRefreshTokenCookie = (res, refreshToken) =>
 
 const deleteOldRefreshToken = async (req, res) => {
   try {
-    const refreshTokenCookie = req.cookies.refreshToken;
-    await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
+    // const refreshTokenCookie = req.cookies.refreshToken;
+    // await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
+    await deleteOldRefreshTokenDatabase(req, res);
 
     ///this might be unecessary when updating cookie refreshToken! Check later
     res.clearCookie("refreshToken");
+  } catch (err) {
+    err.message = `Error while deleting old refresh token, ${err}`;
+    throw err;
+  }
+};
+
+const deleteOldRefreshTokenDatabase = async (req, res) => {
+  try {
+    const refreshTokenCookie = req.cookies.refreshToken;
+    await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
   } catch (err) {
     err.message = `Error while deleting old refresh token, ${err}`;
     throw err;
@@ -106,16 +117,25 @@ export const login = async function (req, res, next) {
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
+    await deleteOldRefreshTokenDatabase(req, res);
     // add refreshToken to database
-    await storeRefreshToken(user._id, refreshToken);
-
+    await storeRefreshTokenDatabase(user._id, refreshToken);
     setRefreshTokenCookie(res, refreshToken);
-
-    // await deleteOldRefreshToken(req, res);
 
     res.json({
       accessToken,
-      user: { id: user._id, username },
+      user: {
+        username: user.username,
+        email: user.email,
+        goals: user.goals,
+        rooms: user.rooms,
+        remainingDaysPrev: user.remainingDaysPrev,
+        remainingDaysNow: user.remainingDaysNow,
+        howManyTimesClick: user.howManyTimesClick,
+        remainingDaysPrevRooms: user.remainingDaysPrevRooms,
+        remainingDaysNowRooms: user.remainingDaysNowRooms,
+        howManyTimesClickRooms: user.howManyTimesClickRooms,
+      },
     });
   } catch (err) {
     if (err.name !== "ValidationError")
@@ -159,7 +179,7 @@ export const refreshToken = async function (req, res, next) {
   const newRefreshToken = generateRefreshToken(userId);
 
   setRefreshTokenCookie(res, newRefreshToken);
-  await storeRefreshToken(userId, newRefreshToken);
+  await storeRefreshTokenDatabase(userId, newRefreshToken);
 
   await deleteOldRefreshToken(req, res);
 
@@ -216,8 +236,7 @@ export const createUser = async (req, res, next) => {
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
-    await storeRefreshToken(newUser._id, refreshToken);
-
+    await storeRefreshTokenDatabase(newUser._id, refreshToken);
     setRefreshTokenCookie(res, refreshToken);
 
     res.status(201).json({
@@ -226,7 +245,6 @@ export const createUser = async (req, res, next) => {
       user: newUser,
     });
   } catch (err) {
-    console.error(err.name, "😭😭😭");
     if (err.name !== "ValidationError" || err.name !== "ExpressValidatorError")
       err.message = "Server error while creating user";
 
