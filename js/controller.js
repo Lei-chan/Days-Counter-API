@@ -188,28 +188,28 @@ export const refreshToken = async function (req, res, next) {
   });
 };
 
-export const getCurrentUser = async function (req, res, next) {
-  try {
-    const user = req.user;
+// export const getCurrentUser = async function (req, res, next) {
+//   try {
+//     const user = req.user;
 
-    if (!user) {
-      const err = new Error("User not found");
-      err.statusCode = 404;
-      return next(err);
-    }
+//     if (!user) {
+//       const err = new Error("User not found");
+//       err.statusCode = 404;
+//       return next(err);
+//     }
 
-    res.json({
-      success: true,
-      user,
-    });
-  } catch (err) {
-    if (err.name !== "ValidationError")
-      err.message = "Server error while fetching user";
+//     res.json({
+//       success: true,
+//       user,
+//     });
+//   } catch (err) {
+//     if (err.name !== "ValidationError")
+//       err.message = "Server error while fetching user";
 
-    console.error("Error while fetching user", err);
-    next(err);
-  }
-};
+//     console.error("Error while fetching user", err);
+//     next(err);
+//   }
+// };
 
 export const createUser = async (req, res, next) => {
   try {
@@ -248,6 +248,20 @@ export const createUser = async (req, res, next) => {
     if (err.name !== "ValidationError" || err.name !== "ExpressValidatorError")
       err.message = "Server error while creating user";
 
+    next(err);
+  }
+};
+
+export const saveUserDataBeforeUserLeaves = async (req, res, next) => {
+  try {
+    const userData = JSON.parse(req.body);
+    const userId = userData._id;
+    console.log(userId);
+    const updatedUser = await User.findByIdAndUpdate(userId, userData, {
+      new: true,
+    });
+    console.log("User data saved successfully!", updatedUser);
+  } catch (err) {
     next(err);
   }
 };

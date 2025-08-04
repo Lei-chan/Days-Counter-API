@@ -1,7 +1,7 @@
 import express from "express";
 import {
   createUser,
-  getCurrentUser,
+  // getCurrentUser,
   login,
   refreshToken,
   updateUser,
@@ -16,6 +16,7 @@ import {
   deleteRoom,
   deleteRooms,
   updatePassword,
+  saveUserDataBeforeUserLeaves,
 } from "./controller.js";
 import { authenticateToken, hashNewPassword } from "./middleware/auth.js";
 import {
@@ -44,7 +45,7 @@ router.post("/user/login", login);
 
 router.post("/user/refresh", refreshToken);
 
-router.get("/user/get", authenticateToken, getCurrentUser);
+// router.get("/user/get", authenticateToken, getCurrentUser);
 
 router.post("/user/create", validateNewUser, handleValidatorErrors, createUser);
 
@@ -74,6 +75,9 @@ router.get("/room/findUsers/:roomId", findUserRoom);
 router.get("/room/:roomId", authenticateToken, getRoom);
 router.patch("/room/update/:roomId", authenticateToken, updateRoom);
 router.delete("/room/delete/:roomId", authenticateToken, deleteRoom);
+
+// router.post("/user/saveUserData", authenticateToken, updateUser);
+router.post("/user/saveUserData", saveUserDataBeforeUserLeaves);
 
 router.delete("/room/deleteAll", deleteRooms);
 

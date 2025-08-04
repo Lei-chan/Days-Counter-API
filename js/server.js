@@ -9,7 +9,11 @@ let server;
 const startServer = async function () {
   await connectDB();
   server = app.listen(PORT, () => {
-    console.log(`🚀 Server is running on ${process.env.SERVER_URL}`);
+    console.log(
+      process.env.NODE_ENV === "production"
+        ? `🚀 Server is running on ${process.env.SERVER_URL}`
+        : `Server is running on http://localhost:${PORT}`
+    );
 
     ////For dev
     // console.log(`Server is running on http://localhost:${PORT}`);
