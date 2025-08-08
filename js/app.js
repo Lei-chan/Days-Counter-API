@@ -37,20 +37,20 @@ app.use(
   })
 );
 
-// const limiter = rateLimit({
-//   windowMs: 8 * 60 * 1000,
-//   max: 100,
-//   message: {
-//     success: false,
-//     message: "Too many requiests from this IP! <br>Try again later",
-//   },
-// });
+const limiter = rateLimit({
+  windowMs: 8 * 60 * 1000,
+  max: 100,
+  message: {
+    success: false,
+    message: "Too many requiests from this IP! <br>Try again later",
+  },
+});
 
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 
-app.use("/api", routes);
+app.use("/api", limiter, routes);
 
 app.use(errorHandler);
 
