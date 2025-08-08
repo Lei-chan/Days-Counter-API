@@ -256,11 +256,11 @@ export const saveUserDataBeforeUserLeaves = async (req, res, next) => {
   try {
     const userData = JSON.parse(req.body);
     const userId = userData._id;
-    console.log(userId);
+    // console.log(userId);
     const updatedUser = await User.findByIdAndUpdate(userId, userData, {
       new: true,
     });
-    console.log("User data saved successfully!", updatedUser);
+    // console.log("User data saved successfully!", updatedUser);
   } catch (err) {
     next(err);
   }
@@ -299,7 +299,7 @@ export const updateUser = async (req, res, next) => {
       .select("-password")
       .select("-__v");
 
-    console.log("User updated successfully!!", updatedUser);
+    // console.log("User updated successfully!!", updatedUser);
 
     res.json({
       message: "User updated successfully",
