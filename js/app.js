@@ -51,7 +51,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 
-app.use("/api", limiter, routes);
+app.use("/api", routes);
 
 app.use(errorHandler);
 
