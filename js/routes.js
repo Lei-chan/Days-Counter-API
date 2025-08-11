@@ -1,20 +1,17 @@
 import express from "express";
 import {
-  createUser,
   // getCurrentUser,
   login,
+  createUser,
   refreshToken,
   updateUser,
   logout,
   deleteUser,
-  deleteUsers,
-  deleteTokens,
   createRoom,
   findUserRoom,
   getRoom,
   updateRoom,
   deleteRoom,
-  deleteRooms,
   updatePassword,
   saveUserDataBeforeUserLeaves,
 } from "./controller.js";
@@ -36,10 +33,6 @@ router.get("/user/health", (req, res) => {
     uptime: process.uptime,
   });
 });
-
-//For dev
-router.delete("/user/deleteAll", deleteUsers);
-router.delete("/user/deleteTokens", deleteTokens);
 
 router.post("/user/login", login);
 
@@ -76,9 +69,6 @@ router.get("/room/:roomId", authenticateToken, getRoom);
 router.patch("/room/update/:roomId", authenticateToken, updateRoom);
 router.delete("/room/delete/:roomId", authenticateToken, deleteRoom);
 
-// router.post("/user/saveUserData", authenticateToken, updateUser);
 router.post("/user/saveUserData", saveUserDataBeforeUserLeaves);
-
-router.delete("/room/deleteAll", deleteRooms);
 
 export default router;

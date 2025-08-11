@@ -17,21 +17,20 @@ const storeRefreshTokenDatabase = async (userId, refreshToken) =>
     expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
   });
 
-const setRefreshTokenCookie = (res, refreshToken) =>
+const setRefreshTokenCookie = (res, refreshToken) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, //7days
   });
+};
 
+///OK
 const deleteOldRefreshToken = async (req, res) => {
   try {
-    // const refreshTokenCookie = req.cookies.refreshToken;
-    // await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
     await deleteOldRefreshTokenDatabase(req, res);
 
-    ///this might be unecessary when updating cookie refreshToken! Check later
     res.clearCookie("refreshToken");
   } catch (err) {
     err.message = `Error while deleting old refresh token, ${err}`;
@@ -39,9 +38,11 @@ const deleteOldRefreshToken = async (req, res) => {
   }
 };
 
+///OK
 const deleteOldRefreshTokenDatabase = async (req, res) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken;
+
     await RefreshToken.deleteOne({ refreshToken: refreshTokenCookie });
   } catch (err) {
     err.message = `Error while deleting old refresh token, ${err}`;
@@ -99,6 +100,7 @@ export const updatePassword = async function (req, res, next) {
   }
 };
 
+////OK
 export const login = async function (req, res, next) {
   try {
     const { username, password } = req.body;
@@ -118,9 +120,9 @@ export const login = async function (req, res, next) {
     const refreshToken = generateRefreshToken(user._id);
 
     await deleteOldRefreshTokenDatabase(req, res);
-    // add refreshToken to database
-    await storeRefreshTokenDatabase(user._id, refreshToken);
+
     setRefreshTokenCookie(res, refreshToken);
+    await storeRefreshTokenDatabase(user._id, refreshToken);
 
     res.json({
       accessToken,
@@ -144,6 +146,7 @@ export const login = async function (req, res, next) {
   }
 };
 
+////OK
 export const refreshToken = async function (req, res, next) {
   const refreshTokenCookie = req.cookies.refreshToken;
 
@@ -178,10 +181,10 @@ export const refreshToken = async function (req, res, next) {
   const newAccessToken = generateAccessToken(userId);
   const newRefreshToken = generateRefreshToken(userId);
 
+  await deleteOldRefreshTokenDatabase(req, res);
+
   setRefreshTokenCookie(res, newRefreshToken);
   await storeRefreshTokenDatabase(userId, newRefreshToken);
-
-  await deleteOldRefreshToken(req, res);
 
   res.json({
     accessToken: newAccessToken,
@@ -236,8 +239,8 @@ export const createUser = async (req, res, next) => {
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
 
-    await storeRefreshTokenDatabase(newUser._id, refreshToken);
     setRefreshTokenCookie(res, refreshToken);
+    await storeRefreshTokenDatabase(newUser._id, refreshToken);
 
     res.status(201).json({
       message: "User created successfully",
@@ -256,11 +259,8 @@ export const saveUserDataBeforeUserLeaves = async (req, res, next) => {
   try {
     const userData = JSON.parse(req.body);
     const userId = userData._id;
-    // console.log(userId);
-    const updatedUser = await User.findByIdAndUpdate(userId, userData, {
-      new: true,
-    });
-    // console.log("User data saved successfully!", updatedUser);
+
+    await User.findByIdAndUpdate(userId, userData);
   } catch (err) {
     next(err);
   }
@@ -298,8 +298,6 @@ export const updateUser = async (req, res, next) => {
     })
       .select("-password")
       .select("-__v");
-
-    // console.log("User updated successfully!!", updatedUser);
 
     res.json({
       message: "User updated successfully",
@@ -469,46 +467,46 @@ export const deleteRoom = async function (req, res, next) {
 };
 
 //For dev
-export const deleteUsers = async function (req, res, next) {
-  try {
-    const deleted = await User.deleteMany();
+// export const deleteUsers = async function (req, res, next) {
+//   try {
+//     const deleted = await User.deleteMany();
 
-    res.json({
-      success: true,
-      message: "Users deleted successfully",
-      data: deleted,
-    });
-  } catch (err) {
-    console.error("Error while deleting users", err);
-  }
-};
+//     res.json({
+//       success: true,
+//       message: "Users deleted successfully",
+//       data: deleted,
+//     });
+//   } catch (err) {
+//     console.error("Error while deleting users", err);
+//   }
+// };
 
-export const deleteTokens = async function (req, res, next) {
-  try {
-    const deleted = await RefreshToken.deleteMany();
+// export const deleteTokens = async function (req, res, next) {
+//   try {
+//     const deleted = await RefreshToken.deleteMany();
 
-    res.clearCookie(req.cookies.refreshToken);
+//     res.clearCookie(req.cookies.refreshToken);
 
-    res.json({
-      success: true,
-      message: "tokens deleted successfully",
-      data: deleted,
-    });
-  } catch (err) {
-    console.error("Error while deleting tokens", err);
-  }
-};
+//     res.json({
+//       success: true,
+//       message: "tokens deleted successfully",
+//       data: deleted,
+//     });
+//   } catch (err) {
+//     console.error("Error while deleting tokens", err);
+//   }
+// };
 
-export const deleteRooms = async function (req, res, next) {
-  try {
-    const deleted = await Room.deleteMany();
+// export const deleteRooms = async function (req, res, next) {
+//   try {
+//     const deleted = await Room.deleteMany();
 
-    res.json({
-      success: true,
-      message: "Rooms deleted successfully",
-      data: deleted,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+//     res.json({
+//       success: true,
+//       message: "Rooms deleted successfully",
+//       data: deleted,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };

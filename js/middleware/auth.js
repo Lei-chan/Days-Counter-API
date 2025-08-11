@@ -43,6 +43,7 @@ export const authenticateToken = async function (req, res, next) {
   }
 
   const decoded = verifyAccessToken(token);
+  console.log("decoded by verifyAccessToken", decoded);
   if (!decoded) {
     const err = new Error("Invalid or expired access token");
     err.statusCode = 403;

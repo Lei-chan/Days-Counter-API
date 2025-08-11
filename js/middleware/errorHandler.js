@@ -2,17 +2,13 @@ const errorHandler = function (err, req, res, next) {
   let error = { ...err };
   error.message = err.message;
 
-  console.log(`Error caught: ${err}`);
-
   //MongoDB bad onjectId error
   if (err.name === "CastError")
     error = { message: "Resource not found", statusCode: 404 };
 
   //MongoDB duplicate key error
-  if (err.statusCode === 11000) {
-    console.log(err);
+  if (err.statusCode === 11000)
     error = { message: "Duplicate field value", statusCode: 400 };
-  }
 
   //MongoDB validation error
   if (err.name === "ValidationError") {

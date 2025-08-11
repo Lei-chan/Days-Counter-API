@@ -14,9 +14,6 @@ const startServer = async function () {
         ? `🚀 Server is running on ${process.env.SERVER_URL}`
         : `Server is running on http://localhost:${PORT}`
     );
-
-    ////For dev
-    // console.log(`Server is running on http://localhost:${PORT}`);
   });
 };
 startServer();
