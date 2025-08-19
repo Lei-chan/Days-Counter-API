@@ -329,8 +329,10 @@ export const deleteUser = async (req, res, next) => {
     const { password } = req.body;
 
     const userWithPassword = await User.findById(user._id).select("+password");
+    console.log("userWithPassword", userWithPassword);
 
     const isValidPassword = await userWithPassword.comparePassword(password);
+    console.log("isValidPassword", isValidPassword);
 
     if (!isValidPassword) {
       const err = new Error("Invalid password was enterd");

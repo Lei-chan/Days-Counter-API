@@ -89,7 +89,6 @@ userSchema.pre("save", async function (next) {
   try {
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, salt);
-    // console.log(salt, this.password);
     next();
   } catch (err) {
     next(err);
@@ -97,11 +96,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  // console.log(candidatePassword, this.password);
+  console.log(
+    "in comparePassword",
+    await bcrypt.compare(candidatePassword, this.password)
+  );
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// export const fields = Object.keys(userSchema.obj);
 export const generalUpdateFields = ["username", "email", "goals", "rooms"];
 export const User = mongoose.model("User", userSchema);
 export const Room = mongoose.model("Room", roomSchema);
