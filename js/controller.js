@@ -282,8 +282,9 @@ export const updatePassword = async function (req, res, next) {
     const isValidPassword = await user.comparePassword(curPassword);
 
     if (!isValidPassword) {
-      const err = new Error("This password is incorrect. Please try again.");
-      err.statusCode = 400;
+      const err = new Error("Invalid password was enterd");
+      err.name = "validationFailed";
+      err.statusCode = 403;
       return next(err);
     }
 
@@ -329,10 +330,8 @@ export const deleteUser = async (req, res, next) => {
     const { password } = req.body;
 
     const userWithPassword = await User.findById(user._id).select("+password");
-    console.log("userWithPassword", userWithPassword);
 
     const isValidPassword = await userWithPassword.comparePassword(password);
-    console.log("isValidPassword", isValidPassword);
 
     if (!isValidPassword) {
       const err = new Error("Invalid password was enterd");
