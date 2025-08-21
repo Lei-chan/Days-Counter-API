@@ -468,7 +468,7 @@ export const findUserRoom = async function (req, res, next) {
 export const resetPasswordFromEmail = async function (req, res, next) {
   try {
     const { email } = req.body;
-    const user = User.findOne({ email });
+    const user = await User.findOne({ email });
 
     if (!user) {
       const err = new Error("Email not found. Please try again!");
