@@ -9,6 +9,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "./middleware/auth.js";
+import { sendEmailResetPassword } from "./sendEmail.js";
 
 const storeRefreshTokenDatabase = async (userId, refreshToken) =>
   await RefreshToken.create({
@@ -458,6 +459,63 @@ export const findUserRoom = async function (req, res, next) {
         ? "Find users for room successfully"
         : "No other users",
       usernames: sharingUsernames || [],
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const resetPasswordFromEmail = async function (req, res, next) {
+  try {
+    const { email } = req.body;
+    const user = User.findOne({ email });
+
+    if (!user) {
+      const err = new Error("Email not found. Please try again!");
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    const accessToken = generateAccessToken(user._id);
+
+    await sendEmailResetPassword(email, accessToken);
+
+    res.json({
+      success: true,
+      message: "Email sent successfully!",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updatePasswordFromEmail = async function (req, res, next) {
+  try {
+    const { password } = req.body;
+    const userId = req.user._id;
+
+    if (!password) {
+      const err = new Error("Password is required");
+      err.statusCode = 400;
+      return next(err);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { password },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    // .select("-password")
+    // .select("-__v");
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
+      updatedField: "password",
+      user: updatedUser,
     });
   } catch (err) {
     next(err);

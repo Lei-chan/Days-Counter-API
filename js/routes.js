@@ -14,12 +14,15 @@ import {
   updateRoom,
   deleteRoom,
   findUserRoom,
+  resetPasswordFromEmail,
+  updatePasswordFromEmail,
 } from "./controller.js";
 import { authenticateToken, hashNewPassword } from "./middleware/auth.js";
 import {
   validateNewUser,
   validateUserGeneral,
   validateUserPasswordUpdate,
+  validateUserPasswordReset,
   handleValidatorErrors,
 } from "./middleware/expressValidatior.js";
 
@@ -41,7 +44,6 @@ router.post("/user/saveUserData", saveUserDataBeforeUserLeaves);
 /////User
 router.post("/user/login", login);
 router.post("/user/create", validateNewUser, handleValidatorErrors, createUser);
-// router.get("/user/get", authenticateToken, getCurrentUser);
 router.patch(
   "/user/update/general",
   authenticateToken,
@@ -59,6 +61,14 @@ router.patch(
 );
 router.post("/user/logout", authenticateToken, logout);
 router.delete("/user/delete", authenticateToken, deleteUser);
+router.post("/user/reset/password", resetPasswordFromEmail);
+router.patch(
+  "/user/reset/password/send",
+  authenticateToken,
+  validateUserPasswordReset,
+  handleValidatorErrors,
+  updatePasswordFromEmail
+);
 
 //////Rooms
 router.post("/room/create", createRoom);

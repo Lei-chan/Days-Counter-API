@@ -82,6 +82,16 @@ export const validateUserPasswordUpdate = [
     ),
 ];
 
+export const validateUserPasswordReset = [
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s])/)
+    .withMessage(
+      "Password must include at least one lowercase letter, one uppercase letter, one digit, and one special chatacter"
+    ),
+];
+
 //Other error validations
 // export const checkUserExists = async function (req, res, next) {
 //   const { id } = req.params;
