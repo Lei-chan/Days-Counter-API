@@ -502,7 +502,7 @@ export const updatePasswordFromEmail = async function (req, res, next) {
 
     const userDatabase = await User.findById(userId);
     userDatabase.password = password;
-    const updatedUser = await userDatabase.save().select("+password");
+    const updatedUser = await userDatabase.save();
     // const updatedUser = await User.findByIdAndUpdate(
     //   userId,
     //   { password },
