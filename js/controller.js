@@ -500,19 +500,21 @@ export const updatePasswordFromEmail = async function (req, res, next) {
       return next(err);
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { password },
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .select("+password")
-      .select("-__v");
+    const userDatabase = await User.findById(userId);
+    userDatabase.password = password;
+    const updatedUser = await userDatabase.save().select("+password");
+    // const updatedUser = await User.findByIdAndUpdate(
+    //   userId,
+    //   { password },
+    //   {
+    //     new: true,
+    //     runValidators: true,
+    //   }
+    // )
+    //   .select("-password")
+    //   .select("-__v");
 
     //For dev
-    console.log(password, updatedUser);
     res.json({
       success: true,
       message: "Password updated successfully",
