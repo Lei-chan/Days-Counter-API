@@ -190,29 +190,6 @@ export const createUser = async (req, res, next) => {
   }
 };
 
-// export const getCurrentUser = async function (req, res, next) {
-//   try {
-//     const user = req.user;
-
-//     if (!user) {
-//       const err = new Error("User not found");
-//       err.statusCode = 404;
-//       return next(err);
-//     }
-
-//     res.json({
-//       success: true,
-//       user,
-//     });
-//   } catch (err) {
-//     if (err.name !== "ValidationError")
-//       err.message = "Server error while fetching user";
-
-//     console.error("Error while fetching user", err);
-//     next(err);
-//   }
-// };
-
 export const updateUser = async (req, res, next) => {
   try {
     const user = req.user;
@@ -500,27 +477,15 @@ export const updatePasswordFromEmail = async function (req, res, next) {
       return next(err);
     }
 
+    ///Use save method to hash password with pre method
     const userDatabase = await User.findById(userId);
     userDatabase.password = password;
-    const updatedUser = await userDatabase.save();
-    // const updatedUser = await User.findByIdAndUpdate(
-    //   userId,
-    //   { password },
-    //   {
-    //     new: true,
-    //     runValidators: true,
-    //   }
-    // )
-    //   .select("-password")
-    //   .select("-__v");
+    await userDatabase.save();
 
-    //For dev
     res.json({
       success: true,
       message: "Password updated successfully",
       updatedField: "password",
-      user: updatedUser,
-      password,
     });
   } catch (err) {
     next(err);
