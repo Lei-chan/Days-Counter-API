@@ -507,15 +507,18 @@ export const updatePasswordFromEmail = async function (req, res, next) {
         new: true,
         runValidators: true,
       }
-    );
-    // .select("-password")
-    // .select("-__v");
+    )
+      .select("+password")
+      .select("-__v");
 
+    //For dev
+    console.log(password, updatedUser);
     res.json({
       success: true,
       message: "Password updated successfully",
       updatedField: "password",
       user: updatedUser,
+      password,
     });
   } catch (err) {
     next(err);
