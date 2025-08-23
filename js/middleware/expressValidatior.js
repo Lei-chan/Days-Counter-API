@@ -1,38 +1,12 @@
 import { body, validationResult } from "express-validator";
 import { User } from "../modelSchemas.js";
-// export const validateUserId = [
-//   param("id").isMongoId().withMessage("Invalid user ID format"),
-// ];
 
 //Custom express validator
 const emailExists = async (email, { req }) => {
-  // if (req.params?.id) {
   const existingUser = await User.findOne({ email: email.toLowerCase() });
 
   if (existingUser && existingUser._id.toString() !== req.params?.id)
     throw new Error("Email already exists");
-  // }
-
-  // if (!req.body?.email && !req.body?.username) return;
-
-  // console.log("req.body:", req.body, "req.user:", req.user);
-
-  // let existingUser;
-  // if (req.body.username)
-  //   existingUser = await User.findOne({
-  //     ...req.body,
-  //     email: req.user.email,
-  //   });
-
-  // if (req.body.email)
-  //   existingUser = await User.findOne({
-  //     ...req.body,
-  //     username: req.user.username,
-  //   });
-
-  // if (!existingUser) return;
-
-  // throw new Error("Username and email already exist");
 };
 
 export const validateNewUser = [
@@ -92,20 +66,6 @@ export const validateUserPasswordReset = [
     ),
 ];
 
-//Other error validations
-// export const checkUserExists = async function (req, res, next) {
-//   const { id } = req.params;
-//   const userData = id ? User.findById(id) : User.find();
-
-//   let err;
-//   if (id && !userData) err = new Error("User not found");
-
-//   if (!id && !userData) err = new Error("Users not found");
-
-//   err.statusCode = 404;
-//   next(err);
-// };
-
 export const handleValidatorErrors = (req, res, next) => {
   const errors = validationResult(req);
 
@@ -114,7 +74,7 @@ export const handleValidatorErrors = (req, res, next) => {
     err.name = "ExpressValidatorError";
     err.statusCode = 400;
     err.validationErrors = errors.array();
-    console.log(err);
+
     return next(err);
   }
 
